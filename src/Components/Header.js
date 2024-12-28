@@ -19,7 +19,6 @@ const Header = ({gameState, currentPLayer, winPlayer}) => {
     return (
         <div className='header'>
             <div className='header-text'>{renderLabel()}</div>
-            
         </div>
     )
 }

@@ -18,30 +18,33 @@ const GameBoard =() =>{
         initGame();
     },[]);
 
-    //intial default values
+    //intial default values, this is called in the start of the game (useEffect) or when the new game button is clicked
     const initGame = () =>{
         setGameBoard(Array(NO_CIRCLES).fill(NO_PLAYER));
         setCurrentPlayer(PLAYER_1);
         setGameState(GAME_STATE_PLAYING);
     }
 
+    //generate the whole board (calls/generate renderCircle() and assigns its id and key)
     const initBoard = () => {
         const circles = [];
+   
         for(let i = 0; i < NO_CIRCLES; i++){
             renderCircle(i);
             circles.push(renderCircle(i));
         }
         return circles;
     };
-
+ 
     const suggestMove =() =>{
+        // will return an id suggested by the computer sent it to the circleClicked()
         circleClicked(getComputerMove(gameBoard));
     }
 
     const circleClicked = (id) =>{
-        console.log("circle clicked:" + id);
 
-        //Check if the circle has no player (haven't clicked on)
+        // This wont let the player to override if there is already a player in the id
+        // Will return if occupied 
         if(gameBoard[id] !== NO_PLAYER) return;
         // Check if the game is over
         if(gameState !== GAME_STATE_PLAYING) return;
@@ -52,21 +55,30 @@ const GameBoard =() =>{
             setGameState(GAME_STATE_WIN);
             setWinPlayer(currentPLayer);
         }
+
+        // Check if draw condition is met
         if(isDraw(gameBoard, id, currentPLayer)){
-            //Set the gamestate to win
+            //Set the gamestate to draw
             setGameState(GAME_STATE_DRAW);
             setWinPlayer(NO_PLAYER);
         }
 
+
+        //update the value of the gameboard to the current player(if the id is the same position in the map),
+        //if not it will just return the prev value (circle)
         setGameBoard(prev =>{
             return prev.map((circle, pos) => {
                 if(pos === id) return currentPLayer;
                 return circle;
             });
         });
+
+        //change the currentplayer
         setCurrentPlayer(currentPLayer === PLAYER_1 ? PLAYER_2: PLAYER_1);
     };
     
+    //This the individual circle, gets the id from the gameboard
+    //The classname is dynamically changing depending on the value in the gameboard ( no player = 0, player1 = 1, player2 = 2)
     const renderCircle = id =>{
         return  <GameCircle key={id} id={id}  className={`player${gameBoard[id]}`} onCircleClicked={circleClicked} />
     }
